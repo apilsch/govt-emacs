@@ -784,12 +784,13 @@ BUFFER and ALIST are as for `display-buffer-full-frame'."
 	    "<leader> u" 'universal-argument-more
 	    "C-u" 'universal-argument-more)
   (general-nmap
-    "<leader> s f" 'consult-find
-    "<leader> s g" 'consult-grep
-    "<leader> s G" 'consult-git-grep
-    "<leader> s r" 'consult-ripgrep
-    "<leader> s h" 'consult-info
-    "<leader> /" 'consult-line
+    "<leader> f f" 'consult-find
+    "<leader> f g" 'consult-grep
+    "<leader> f G" 'consult-git-grep
+    "<leader> f r" 'consult-ripgrep
+    "<leader> f h" 'consult-info
+    "<leader> f l" 'consult-line
+	"<leader> f L" 'consult-goto-line
 
     ;; Flymake navigation
     "<leader> x x" 'consult-flymake;; Gives you something like `trouble.nvim'
@@ -1809,9 +1810,16 @@ Switch to TODO otherwise"
 	:protocol "http"
 	:host "cubtram:8000"
 	:key "omlx"
-	:models '(Muse-Glimmer-30B-4bit gemma-4-26B-A4B-it-QAT-MLX-4bit))
-  (setq gptel-model 'Muse-Glimmer-30B-4bit
-		gptel-backend (gptel-get-backend "omlx")))
+	:models '(gemma-4-26B-A4B-it-QAT-MLX-4bit))
+  (gptel-make-openai "omlx-nothink"
+	:stream t
+	:protocol "http"
+	:host "cubtram:8000"
+	:key "omlx"
+	:models '(gemma-4-26B-A4B-it-QAT-MLX-4bit)
+	:request-params '(:chat_template_kwargs (:enable_thinking :json-false)))
+  (setq gptel-model 'gemma-4-26B-A4B-it-QAT-MLX-4bit
+		gptel-backend (gptel-get-backend "omlx-nothink")))
 
 
 (use-package gptel-inline
@@ -1843,6 +1851,22 @@ Switch to TODO otherwise"
                 (lambda (fn ov chunk)
                   (let ((inhibit-read-only t))
                     (funcall fn ov chunk))))))
+
+;;; GPTEL MAGIT
+;; Uses the fantastic gptel to extend the equally fantastic magit with
+;; some LLM-powered functionality.
+;;
+;; Functionality is provided for:
+;;
+;; + Generating commit messages
+;; + Explaining diffs
+(use-package gptel-magit
+  :straight t
+  :hook (magit-mode . gptel-magit-install))
+
+
+(use-package markdown-mode
+  :straight t)
 
 
 ;;; UTILITARY FUNCTION TO INSTALL EMACS-KICK
