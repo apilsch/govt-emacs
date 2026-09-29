@@ -1808,13 +1808,13 @@ Switch to TODO otherwise"
   (gptel-make-openai "omlx"
 	:stream t
 	:protocol "http"
-	:host "cubtram:8000"
+	:host "localhost:8000"
 	:key "omlx"
 	:models '(gemma-4-26B-A4B-it-QAT-MLX-4bit))
   (gptel-make-openai "omlx-nothink"
 	:stream t
 	:protocol "http"
-	:host "cubtram:8000"
+	:host "localhost:8000"
 	:key "omlx"
 	:models '(gemma-4-26B-A4B-it-QAT-MLX-4bit)
 	:request-params '(:chat_template_kwargs (:enable_thinking :json-false)))
