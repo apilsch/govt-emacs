@@ -233,50 +233,6 @@ BUFFER and ALIST are as for `display-buffer-full-frame'."
                          (number-to-string (length package-activated-list))))))))
 
 
-;;; WINDOW
-;; This section configures window management in Emacs, enhancing the way buffers
-;; are displayed for a more efficient workflow. The `window' use-package helps
-;; streamline how various buffers are shown, especially those related to help,
-;; diagnostics, and completion.
-;;
-;; Note: I have left some commented-out code below that may facilitate your
-;; Emacs journey later on. These configurations can be useful for displaying
-;; other types of buffers in side windows, allowing for a more organized workspace.
-(use-package window
-  :ensure nil       ;; This is built-in, no need to fetch it.
-  :custom
-  (display-buffer-alist
-   '(
-     ;; ("\\*.*e?shell\\*"
-     ;;  (display-buffer-in-side-window)
-     ;;  (window-height . 0.25)
-     ;;  (side . bottom)
-     ;;  (slot . -1))
-
-     ("\\*\\(Backtrace\\|Warnings\\|Compile-Log\\|[Hh]elp\\|Messages\\|Bookmark List\\|Ibuffer\\|Occur\\|eldoc.*\\)\\*"
-      (display-buffer-in-side-window)
-      (window-height . 0.25)
-      (side . bottom)
-      (slot . 0))
-
-     ;; Example configuration for the LSP help buffer,
-     ;; keeps it always on bottom using 25% of the available space:
-     ("\\*\\(lsp-help\\)\\*"
-      (display-buffer-in-side-window)
-      (window-height . 0.25)
-      (side . bottom)
-      (slot . 0))
-
-     ;; Configuration for displaying various diagnostic buffers on
-     ;; bottom 25%:
-     ("\\*\\(Flymake diagnostics\\|xref\\|ivy\\|Swiper\\|Completions\\)"
-      (display-buffer-in-side-window)
-      (window-height . 0.25)
-      (side . bottom)
-      (slot . 1))
-     )))
-
-
 ;;; DIRED
 ;; In Emacs, the `dired' package provides a powerful and built-in file manager
 ;; that allows you to navigate and manipulate files and directories directly
@@ -452,14 +408,18 @@ BUFFER and ALIST are as for `display-buffer-full-frame'."
   :hook
   (after-init . which-key-mode)) ;; Enable which-key mode after initialization.
 
-(use-package eshell
+
+;;; MARKDOWN-MODE
+;; Markdown Mode provides support for editing Markdown files in Emacs,
+;; enabling features like syntax highlighting, previews, and more.
+;; It’s particularly useful for README files, as it can be set
+;; to use GitHub Flavored Markdown for enhanced compatibility.
+(use-package markdown-ts-mode
   :ensure nil
-  :defer t
-  :commands 'eshell-command
-  :general
-  ("C-c o t" 'eshell)
-  :general-config
-  ("C-c C-r" 'eshell-command))
+  :mode ("\\.md\\'" "\\.mdx\\'" "\\.markdown\\'")
+  :config
+  (require 'markdown-ts-mode-x))
+
 
 ;;; ==================== EXTERNAL PACKAGES ====================
 ;;
@@ -561,9 +521,10 @@ BUFFER and ALIST are as for `display-buffer-full-frame'."
    [remap goto-line]  'consult-goto-line
    [remap imenu]  'consult-imenu
    [remap browse-kill-ring]  'consult-yank-from-kill-ring
-   [remap recentf]  'consult-recent-file
-   "<leader> A"  'consult-org-agenda
-   "<leader> B"  'consult-buffer)
+   [remap recentf]  'consult-recent-file)
+  (general-nmap
+		   "<leader> A"  'consult-org-agenda
+		   "<leader> B"  'consult-buffer)
 
   :init
   ;; Enhance register preview with thin lines and no mode line.
@@ -625,6 +586,7 @@ BUFFER and ALIST are as for `display-buffer-full-frame'."
   :config
   (treesit-auto-add-to-auto-mode-alist 'all)
   (global-treesit-auto-mode t))
+
 
 (use-package corfu
   :straight t
@@ -821,7 +783,7 @@ BUFFER and ALIST are as for `display-buffer-full-frame'."
   (:keymaps 'universal-argument-map
 	    "<leader> u" 'universal-argument-more
 	    "C-u" 'universal-argument-more)
-  (general-nivmap
+  (general-nmap
     "<leader> s f" 'consult-find
     "<leader> s g" 'consult-grep
     "<leader> s G" 'consult-git-grep
@@ -896,7 +858,7 @@ BUFFER and ALIST are as for `display-buffer-full-frame'."
   :config
   ;; Set the leader key to space for easier access to custom commands. (setq evil-want-leader t)
   ;; (evil-set-leader nil (kbd "C-c l") t)
-  (evil-set-leader nil (kbd "C-c"))
+  (evil-set-leader nil (kbd "SPC"))
 
   (define-advice forward-evil-paragraph (:around (orig-fun &rest args))
     (let ((paragraph-start (default-value 'paragraph-start))
@@ -988,21 +950,21 @@ BUFFER and ALIST are as for `display-buffer-full-frame'."
 (use-package evil-numbers
   :straight t
   :general
-  ("<leader> +" 'evil-numbers/inc-at-pt
-   "<leader> =" 'evil-numbers/inc-at-pt
-   "<leader> -" 'evil-numbers/dec-at-pt
-   "<leader> C-+" 'evil-numbers/inc-at-pt-incremental
-   "<leader> C-=" 'evil-numbers/inc-at-pt-incremental
-   "<leader> C--" 'evil-numbers/dec-at-pt-incremental)
+  ("C-c +" 'evil-numbers/inc-at-pt
+   "C-c =" 'evil-numbers/inc-at-pt
+   "C-c -" 'evil-numbers/dec-at-pt
+   "C-c C-+" 'evil-numbers/inc-at-pt-incremental
+   "C-c C-=" 'evil-numbers/inc-at-pt-incremental
+   "C-c C--" 'evil-numbers/dec-at-pt-incremental)
   :config
   (defvar-keymap evil-numbers-repeat-map
-    :repeat t
-    "+" 'evil-numbers/inc-at-pt
-    "=" 'evil-numbers/inc-at-pt
-    "C-=" 'evil-numbers/inc-at-pt-incremental
-    "C-+" 'evil-numbers/inc-at-pt-incremental
-    "C--" 'evil-numbers/dec-at-pt-incremental
-    "-" 'evil-numbers/dec-at-pt))
+	:repeat t
+	"+" 'evil-numbers/inc-at-pt
+	"=" 'evil-numbers/inc-at-pt
+	"C-=" 'evil-numbers/inc-at-pt-incremental
+	"C-+" 'evil-numbers/inc-at-pt-incremental
+	"C--" 'evil-numbers/dec-at-pt-incremental
+	"-" 'evil-numbers/dec-at-pt))
 
 ;; EVIL MATCHIT
 ;; The `evil-matchit' package extends `evil-mode' by enabling
@@ -1282,7 +1244,8 @@ BUFFER and ALIST are as for `display-buffer-full-frame'."
 (use-package avy
   :straight t
   :general
-  ("M-;" 'avy-goto-char-timer
+  ("M-;" 'avy-goto-char-timer)
+  (general-nmap
    "<leader>gb" 'avy-pop-mark
    "<leader>gl" 'avy-goto-line
    "<leader>gg" 'avy-goto-char-timer)
@@ -1412,13 +1375,14 @@ BUFFER and ALIST are as for `display-buffer-full-frame'."
   :mode ("\\.org\\'" . org-mode)
   :commands (org-mode org-agenda org-capture)
   :general
-  ("<leader> a" 'org-agenda
+  (general-nmap
+	"<leader> a" 'org-agenda
    "<leader> c" 'org-capture)
   :general-config
   (:keymaps 'org-mode-map
 	    "C-M-<up>" 'org-up-element
 	    "C-z" 'org-cycle-list-bullet)
-  (general-nivmap ;; Org open controls
+  (general-nmap ;; Org open controls
     "<leader>oj" 'org-clock-goto
     "<leader>ol" 'org-clock-in-last
     "<leader>oi" 'org-clock-in
@@ -1746,6 +1710,140 @@ Switch to TODO otherwise"
   (with-eval-after-load 'vertico-multiform
     (add-to-list 'vertico-multiform-categories
                  '(jinx grid (vertico-grid-annotate . 20)))))
+
+
+;;; GHOSTEL
+;; Provides a termainl using is a terminal emulator for Emacs powered by
+;; libghostty-vt, the VT engine behind the Ghostty terminal.
+;;
+;; It aims to be featureful, fast, robust and correct.
+;;
+;; Ghostel's features include synchronized output, true color, the Kitty keyboard
+;; and graphics protocols, hyperlinks, desktop notifications, progress reports and
+;; a lot more.
+;;
+;; Shell integration (directory tracking, prompt navigation) all works out of the
+;; box for bash, zsh, fish and nushell.
+(use-package ghostel
+  :straight t
+  :init
+  (setq ghostel-compile-global-mode t)
+  (autoload 'ghostel-compile--compilation-start-advice "ghostel-compile")
+  (advice-add 'compilation-start :around #'ghostel-compile--compilation-start-advice)
+  :custom
+  (ghostel-shell '("/usr/bin/env" "fish" "--login"))
+  :hook
+  (ghostel-mode . (lambda ()
+                   (setq-local global-hl-line-mode nil)
+                   (display-line-numbers-mode -1)
+                   ;; Clean up the window when the buffer is killed
+                   (add-hook 'kill-buffer-hook #'ghostel--close-window-on-kill nil t)))
+  :general
+  (general-nmap
+	"<leader> t t" 'ghostel)
+  (:keymaps 'ghostel-semi-char-mode-map
+			"M-`" 'popper-toggle
+			"M-o" 'other-window)
+  (:keymaps 'project-prefix-map
+			"t" 'ghostel-project
+			"T" 'ghostel-project-buffer-list)
+  :config
+  (add-to-list 'project-switch-commands '(ghostel-project "Ghostel") t)
+  (add-to-list 'project-switch-commands '(ghostel-project-list-buffers "Ghostel buffers") t))
+
+
+
+(defun ghostel--close-window-on-kill ()
+  "Remove window if it contains a Ghostel buffer, unless last window."
+  (when (derived-mode-p 'ghostel-mode)
+    ;; Only delete the window if there are other windows in this frame
+    (when (> (length (window-list)) 1)
+      (delete-window))))
+
+;;; POPPER
+;; Popper is a minor-mode to tame the flood of ephemeral windows Emacs
+;; produces, while still keeping them within arm’s reach.
+;;
+;; Designate any buffer to “popup” status, and it will stay out of
+;; your way. Disimss or summon it easily with one key. Cycle through
+;; all your “popups” or just the ones relevant to your current buffer.
+;; Group popups automatically so you’re presented with the most
+;; relevant ones. Useful for many things, including toggling display
+;; of REPLs, documentation, compilation or shell output: any buffer
+;; you need instant access to but want kept out of your way!
+(use-package popper
+  :straight t
+  :bind (("M-`"   . popper-toggle)
+		 ("C-`"   . popper-cycle)
+		 ("C-M-`" . popper-toggle-type))
+  :custom
+  (popper-group-function #'popper-group-by-directory)
+  (popper-reference-buffers
+   '("\\*\\(lsp-help\\|Backtrace\\|Warnings\\|Compile-Log\\|[Hh]elp\\|Messages\\|Bookmark List\\|Occur\\|eldoc.*\\)\\*"
+	 "\\*\\(Flymake diagnostics\\|xref\\|ivy\\|Swiper\\|Completions\\|gptel-reasoning\\|vc-git\\)"
+	 "Output\\*$"
+	 "\\*Async Shell Command\\*"
+	 help-mode
+	 compilation-mode
+	 ghostel-mode))
+  (popper-window-height 'ap/custom-popper--fit-window-height)
+  :hook
+  (after-init . popper-mode)
+  (after-init . popper-tab-line-mode)
+  :init
+  (defvar ap/custom-popper-window-height-alist '((ghostel-mode . 0.45)))
+  (defun ap/custom-popper--fit-window-height (win)
+	"Use `resize-window-by-alist' to customize buffer height. Otherwise, use
+`popper--fit-window-height'."
+	(unless (resize-window-by-alist win ap/custom-popper-window-height-alist)
+	  (popper--fit-window-height win))))
+
+
+(use-package gptel
+  :straight t
+  :custom
+  (gptel-default-mode 'markdown-ts-mode)
+  :config
+  (gptel-make-openai "omlx"
+	:stream t
+	:protocol "http"
+	:host "cubtram:8000"
+	:key "omlx"
+	:models '(Muse-Glimmer-30B-4bit gemma-4-26B-A4B-it-QAT-MLX-4bit))
+  (setq gptel-model 'Muse-Glimmer-30B-4bit
+		gptel-backend (gptel-get-backend "omlx")))
+
+
+(use-package gptel-inline
+  :straight t
+  :general
+  (:keymaps 'gptel-inline-map
+			"C-c m" 'gptel-menu
+			"C-c SPC" 'gptel-inline-cycle-reference)
+  (:keymaps 'gptel-inline--response-overlay-mode-map
+			"j" #'gptel-inline--response-overlay-down
+			"k" #'gptel-inline--response-overlay-up
+			[remap evil-scroll-down] #'gptel-inline--response-overlay-pagedown
+			[remap evil-scroll-up] #'gptel-inline--response-overlay-pageup)
+  :config
+  ;; Upstream bug workaround (gptel-inline ~20260831):
+  ;; `gptel-inline--response-overlay-append-chunk' inserts each streamed chunk
+  ;; into the *gptel-inline-response* source buffer WITHOUT binding
+  ;; `inhibit-read-only'. Once a response involves tool calls that buffer is
+  ;; read-only -- the sibling `gptel-inline--response-overlay-reset' guards its
+  ;; erase with `inhibit-read-only' for exactly this reason -- so every chunk's
+  ;; bare `insert' throws, once per chunk:
+  ;;   Error running timer `gptel-inline--update-response-overlay':
+  ;;     (buffer-read-only #<buffer *gptel-inline-response*>)
+  ;; Bind `inhibit-read-only' around it. Harmless no-op when the buffer is
+  ;; writable; drop this once upstream adds the same guard.
+  (when (fboundp 'gptel-inline--response-overlay-append-chunk)
+    (advice-add 'gptel-inline--response-overlay-append-chunk
+                :around
+                (lambda (fn ov chunk)
+                  (let ((inhibit-read-only t))
+                    (funcall fn ov chunk))))))
+
 
 ;;; UTILITARY FUNCTION TO INSTALL EMACS-KICK
 (defun ek/first-install ()
