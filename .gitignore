@@ -59,3 +59,4 @@ straight/
 var/
 undo-fu-session
 .session
+**/*.eld
