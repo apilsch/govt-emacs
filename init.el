@@ -1810,15 +1810,15 @@ Switch to TODO otherwise"
 	:protocol "http"
 	:host "localhost:8000"
 	:key "omlx"
-	:models '(gemma-4-26B-A4B-it-QAT-MLX-4bit))
+	:models '(gemma-4-12B-it-qat-4bit))
   (gptel-make-openai "omlx-nothink"
 	:stream t
 	:protocol "http"
 	:host "localhost:8000"
 	:key "omlx"
-	:models '(gemma-4-26B-A4B-it-QAT-MLX-4bit)
+	:models '(gemma-4-12B-it-qat-4bit)
 	:request-params '(:chat_template_kwargs (:enable_thinking :json-false)))
-  (setq gptel-model 'gemma-4-26B-A4B-it-QAT-MLX-4bit
+  (setq gptel-model 'gemma-4-12B-it-qat-4bit
 		gptel-backend (gptel-get-backend "omlx-nothink")))
 
 
