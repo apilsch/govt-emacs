@@ -722,20 +722,6 @@ BUFFER and ALIST are as for `display-buffer-full-frame'."
   (sanityinc/fullframe-mode 'magit-status-mode))
 
 
-;;; XCLIP
-;; `xclip' is an Emacs package that integrates the X Window System clipboard
-;; with Emacs. It allows seamless copying and pasting between Emacs and other
-;; applications using the clipboard. When `xclip' is enabled, any text copied
-;; in Emacs can be pasted in other applications, and vice versa, providing a
-;; smooth workflow when working across multiple environments.
-(use-package xclip
-  :ensure t
-  :straight t
-  :defer t
-  :hook
-  (after-init . xclip-mode))     ;; Enable xclip mode after initialization.
-
-
 ;; EVIL
 ;; The `evil' package provides Vim emulation within Emacs, allowing
 ;; users to edit text in a modal way, similar to how Vim
